@@ -26,28 +26,7 @@ def winning_center( x, W ):
 	return win_ind
 
 
-# def lattice_coords(lat,w_ind):
-# 	if lat[0]=="line":
-# 		return w_ind
-
-# 	if lat[0]=="rectangle":
-# 		return w_ind%lat[1], np.floor(w_ind/lat[1])
-
-# 	if lat[0]=="circle":
-# 		return w_ind
-
-# 	if lat[0]=="torus":
-# 		x=lat[1]
-# 		y=lat[2]
-# 		if w_ind==0:
-# 			return np.array([[0,0,x-1,x-1],[0,y-1,0,y-1]])
-# 		elif w_ind<x-1:
-# 			return np.array([[w_ind,w_ind],[0,y-1]])
-# 		elif w_ind%(x-1)==0:
-# 			return np.array([[0,x-1],[w_ind%(x-1),w_ind%(x-1)]])
-# 		else:
-# 			return np.array([[w_ind%(x-1)],[np.floor(w_ind/lat[1])]])
-
+#Returns the coordinates in Euclidean space of a given index on a lattice
 def lat_coords_line(lat,w_ind):
 	return w_ind
 
@@ -69,31 +48,8 @@ def lat_coords_torus(lat,w_ind):
 	else:
 		return np.array([[w_ind%(x-1)],[np.floor(w_ind/lat[1])]])
 
-#Takes two lattice indices (not coordinates) and returns lattice distance
-# def lattice_distance(lat,x,y):
-# 	if lat[0]=="line":
-# 		return abs(x-y)
-
-# 	if lat[0]=="rectangle":
-# 		return la.norm(np.array(lat_coords_rectangle(lat,x))-np.array(lat_coords_rectangle(lat,y)),2)
-
-# 	if lat[0]=="circle":
-# 		if np.abs(x-y)==lat[1]-1:
-# 			return 1
-# 		else:
-# 			return np.abs(x-y)
-
-# 	if lat[0]=="torus":
-# 		z=lattice_coords(lat,x)
-# 		w=lattice_coords(lat,y)
-# 		min_dst=float("inf")
-# 		for a in z.T:
-# 			for b in w.T:
-# 				dst=la.norm(a-b)
-# 				if dst < min_dst:
-# 					min_dst=dst
-
-# 		return min_dst
+#The following functions take two lattice indices x and y (not coordinates) and returns the
+#lattice distance between those two indexes
 
 def lat_dist_line(lat,x,y):
 	return abs(x-y)
@@ -108,8 +64,8 @@ def lat_dist_circle(lat,x,y):
 		return np.abs(x-y)
 
 def lat_dist_torus(lat,x,y):
-	z=lattice_coords(lat,x)
-	w=lattice_coords(lat,y)
+	z=lat_coords_torus(lat,x)
+	w=lat_coords_torus(lat,y)
 	min_dst=float("inf")
 	for a in z.T:
 		for b in w.T:
@@ -152,9 +108,10 @@ class SOM(object):
 			quit()
 
 		self.lattice_nm=params[0]
-		self.lattice=params
+		self.lattice=list(params)
 
-		
+		#if params[0]=="torus":
+
 
 
 
@@ -241,10 +198,10 @@ class SOM(object):
 				for b in range(params[2]):
 					plt.plot(x[a],y[b])
 
-			for i in range(params[1]*params[2]):
-				coords=lattice_coords(self.lattice,i)
-
-			  	#plt.annotate(str(i), ())
+			for i in range((params[1]-1)*(params[2]-1)):
+				coords=lat_coords_torus(self.lattice,i)
+				for c in coords.T:
+					plt.annotate(str(i), (c[0],c[1]))
 
 		if np.shape(W)[0]==1 or np.shape(W)[0]==2:
 			plt.figure()
